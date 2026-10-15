@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A.L.A.Q. (A List, A Queue) - Academic Task & Execution Management System for Students. Built with TypeScript and Webpack.">
+  <title>A.L.A.Q. | Student Academic Task & Queue Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-background-glow glow-1"></div>
+  <div class="app-background-glow glow-2"></div>
+
+  <div class="app-container">
+    <!-- APP HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-logo-badge">
+          <span class="brand-icon">⚡</span>
+          <span class="brand-title">A.L.A.Q.</span>
+        </div>
+        <div class="brand-subtext">
+          <span class="subtext-bold">A List, A Queue</span> — Academic Task & Execution System
+        </div>
+      </div>
+
+      <div class="header-stats">
+        <div class="stat-item" id="stat-pending-item">
+          <span class="stat-number" id="stat-pending-tasks">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number" id="stat-completed-tasks">0</span>
+          <span class="stat-label">Done</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-number" id="stat-total-tasks">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CORE MOTTO BANNER -->
+    <div class="core-principle-banner">
+      <span class="principle-quote">“The List manages commitments. The Queue manages execution. Switching is allowed; losing track of unfinished work isn't.”</span>
+    </div>
+
+    <!-- MAIN NAVIGATION TABS -->
+    <nav class="nav-tabs-container">
+      <div class="nav-tabs">
+        <button id="tab-btn-list" class="nav-tab-btn active">
+          <span class="tab-icon">📋</span>
+          <span class="tab-label">The List</span>
+          <span class="tab-badge" id="pending-count-badge">0</span>
+        </button>
+        <button id="tab-btn-queue" class="nav-tab-btn">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-label">The Queue</span>
+          <span class="pulse-indicator hidden" id="active-queue-pulse" title="Active Execution in progress"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT VIEW -->
+    <main class="main-content">
+      <!-- TAB 1: THE LIST -->
+      <section id="tab-content-list" class="tab-view">
+        <!-- ADD TASK CARD -->
+        <div class="create-task-card">
+          <form id="new-task-form" class="task-form">
+            <div class="form-input-group">
+              <input 
+                type="text" 
+                id="task-title-input" 
+                class="main-input" 
+                placeholder="What academic outcome do you need to commit to? (e.g. Complete TypeScript Lab)..." 
+                required 
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-controls-row">
+              <div class="control-select-wrapper">
+                <label for="task-priority-select" class="control-label">Priority:</label>
+                <select id="task-priority-select" class="custom-select">
+                  <option value="High">L1 — High (Urgent/Critical)</option>
+                  <option value="Medium" selected>L2 — Medium (Important)</option>
+                  <option value="Low">L3 — Low (Routine / Personal)</option>
+                </select>
+              </div>
+
+              <div class="control-input-wrapper">
+                <label for="task-category-input" class="control-label">Category:</label>
+                <input 
+                  type="text" 
+                  id="task-category-input" 
+                  class="category-input" 
+                  placeholder="e.g. Software Eng, Math, Lab"
+                  value="Academic"
+                />
+              </div>
+
+              <button type="submit" id="submit-task-btn" class="btn-primary">
+                <span class="btn-icon">＋</span> Add Commitment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- VISUAL REPRESENTATION HUB (PRIORITY PYRAMID) -->
+        <div class="visualizer-hub-card">
+          <div class="visualizer-header">
+            <div class="visualizer-title-group">
+              <span class="visualizer-badge">🔺 Priority Hierarchy</span>
+              <h3 class="visualizer-heading">Execution Pyramid</h3>
+              <p class="visualizer-caption">Click a tier to focus on that priority level: L3 Personal at the top, L2 Important in the middle, and L1 Critical at the foundation base.</p>
+            </div>
+            <div class="pyramid-controls-action">
+              <button type="button" id="btn-reset-node-filter" class="btn-text-sm hidden">
+                ↺ Show All Tasks
+              </button>
+            </div>
+          </div>
+
+          <!-- THE PYRAMID DISPLAY -->
+          <div class="pyramid-display-wrapper">
+            <div class="pyramid-container" id="pyramid-wrapper">
+              <!-- Rendered dynamically without numbers -->
+            </div>
+          </div>
+
+          <div class="visualizer-footer">
+            <div class="active-filter-indicator" id="pyramid-filter-status">
+              <span>Showing: <strong>All Priorities</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIST CONTROLS & FILTERS -->
+        <div class="list-toolbar">
+          <div class="toolbar-title">
+            <h2 id="list-section-heading">Commitments List</h2>
+            <span class="toolbar-hint" id="list-section-subhint">Click <strong>Tackle</strong> to break into an execution Queue, or check off directly</span>
+          </div>
+          <div class="filter-pills-group">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="pending">Pending</button>
+            <button class="filter-pill" data-filter="completed">Completed</button>
+          </div>
+        </div>
+
+        <!-- TASK ITEMS LIST -->
+        <div id="task-items-container" class="task-items-list">
+          <!-- Populated dynamically by DomRenderer -->
+        </div>
+      </section>
+
+      <!-- TAB 2: THE QUEUE -->
+      <section id="tab-content-queue" class="tab-view hidden">
+        <div id="queue-view-container" class="queue-view-wrapper">
+          <!-- Populated dynamically by DomRenderer -->
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>A.L.A.Q. Academic System &bull; TypeScript Modular Architecture &bull; Webpack Bundled</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- TACKLE BREAKDOWN MODAL -->
+  <div id="tackle-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-badge">⚡ Tackle Planning</span>
+          <h3 id="tackle-modal-task-title">Deconstruct Task</h3>
+          <p class="modal-desc">Break this parent outcome into ordered, actionable steps. The queue executes them sequentially.</p>
+        </div>
+        <button id="close-tackle-modal-btn" class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="tackle-steps-label">Execution Order (Top to Bottom):</div>
+        <div id="tackle-subtask-list" class="tackle-subtasks-container">
+          <!-- Dynamic subtask rows -->
+        </div>
+        <button type="button" id="add-subtask-row-btn" class="btn-text-add">
+          ＋ Add Another Step
+        </button>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="cancel-tackle-btn" class="btn-secondary">Cancel</button>
+        <button type="button" id="commit-tackle-btn" class="btn-primary">
+          🚀 Commit to Queue & Start Executing
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
